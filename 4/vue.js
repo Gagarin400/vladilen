@@ -19,7 +19,7 @@ const App = {
   methods: {
     prev() {
       if (this.activeIndex != 0) {
-        this.activeIndex -= 1;
+        this.activeIndex --
       }
     },
     reset() {
@@ -27,8 +27,8 @@ const App = {
       this.resetBtn = false
     },
     nextOfFinish() {
-      if (this.activeIndex != 4) {
-        this.activeIndex += 1;
+      if (this.activeIndex !== this.steps.length - 1) {
+        this.activeIndex ++
       }else {
         this.resetBtn = true
       }
@@ -41,12 +41,10 @@ const App = {
     // тут стоит определить несколько свойств:
     // 1. текущий выбранный шаг
     firstStep() {
-      if (this.activeIndex === 0) {
-        return true
-      }
+      return this.activeIndex === 0
     },
     lastStep() {
-      if (this.activeIndex != 4) {
+      if (this.activeIndex !== this.steps.length - 1) {
         return 'Вперед'
       }else {
         return 'Закончить'
