@@ -23,9 +23,9 @@
           ><span>{{ idx + 1 }}</span> {{ steps[idx].title }}</li>
         </ul>
         <div>
-          <button class="btn" @click="prev" :disabled="firstStep" v-show="resetBtn == false">Назад</button>
-          <button class="btn primary" @click="nextOfFinish" v-html="lastStep" v-show="resetBtn == false"></button>
-          <button class="btn" @click="reset" v-show="resetBtn">Начать заново</button>
+          <button class="btn" @click="prev" :disabled="firstStep" v-if="!isDone">Назад</button>
+          <button class="btn" @click="reset" v-else>Начать заново</button>
+          <button class="btn primary" @click="nextOfFinish" v-html="lastStep" v-show="!isDone"></button>
         </div>
       </div>
     </div>
