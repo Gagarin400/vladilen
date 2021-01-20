@@ -10,7 +10,7 @@
         <app-text-area label="Значение" v-model="textAreaValue"></app-text-area>
         <app-button :disabled="disabledBtn">Добавить</app-button>
       </form>
-      <app-resume :content="resume" :empty="emptyResume"></app-resume>
+      <app-resume :content="resume" :loading="load"></app-resume>
     </div>
     <app-comments
       textButton="Загрузить комментарии"
@@ -32,45 +32,64 @@ export default {
   components: { AppSelect, AppTextArea, AppButton, AppResume, AppComments },
   data() {
     return {
-      selectValue: "Заголовок",
+      selectValue: "title",
       textAreaValue: "",
-      typeBlock: {
-        title: "Заголовок",
-        subtitle: "Подзаголовок",
-        avatar: "Аватар",
-        text: "Текст",
-      },
-      resume: [
-        {
-          title: "",
-          subtitle: "",
-          avatar: "",
-          text: "",
-        },
+      typeBlock: [
+        { type: "title", text: "Заголовок" },
+        { type: "subtitle", text: "Подзаголовок" },
+        { type: "avatar", text: "Аватар" },
+        { type: "text", text: "Текст" },
       ],
+      resume: [],
       emptyResume: true,
       load: false,
       comments: [],
     };
   },
+  mounted() {
+    this.loadResume();
+  },
   methods: {
-    addBlock() {
-      this.emptyResume = false;
-      console.log(this.selectValue);
-      console.log(this.textAreaValue);
-
-      this.resume[
-        Object.keys(this.typeBlock).find(
-          (key) => this.typeBlock[key] === this.selectValue
-        )
-      ] = this.textAreaValue;
-      this.selectValue = "Заголовок";
-      this.textAreaValue = "";
+    async addBlock() {
+      try {
+        await fetch(
+          "https://vue-with-http-d9231-default-rtdb.firebaseio.com/resume.json",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              type: this.selectValue,
+              text: this.textAreaValue,
+            }),
+          }
+        );
+        this.resume.push({ type: this.selectValue, text: this.textAreaValue });
+        this.selectValue = "title";
+        this.textAreaValue = "";
+      } catch (e) {
+        console.log(e.message);
+      }
     },
-    loadComments() {
-      this.load = true;
-      (this.comments = []), (this.load = true);
-      setTimeout(async () => {
+    async loadResume() {
+      try {
+        const { data } = await axios.get(
+          "https://vue-with-http-d9231-default-rtdb.firebaseio.com/resume.json"
+        );
+        this.resume = Object.keys(data).map((key) => {
+          return {
+            id: key,
+            ...data[key],
+          };
+        });
+      } catch (e) {
+        console.log(e.message);
+      }
+    },
+    async loadComments() {
+      try {
+        this.load = true;
         const { data } = await axios.get(
           "https://jsonplaceholder.typicode.com/comments?_limit=42"
         );
@@ -81,7 +100,10 @@ export default {
           };
         });
         this.load = false;
-      }, 1500);
+      } catch (e) {
+        console.log(e.message);
+        this.load = false;
+      }
     },
   },
   computed: {

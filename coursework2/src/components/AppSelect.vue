@@ -2,8 +2,8 @@
   <div class="form-control">
     <label :for="id">{{ label }}</label>
     <select :id="id" @change="change" :value="modelValue">
-      <option v-for="(value, key) in partSelect" :key="key" :value="value">
-        {{ value }}
+      <option v-for="(value, key) in partSelect" :key="key" :value="value.type">
+        {{ value.text }}
       </option>
     </select>
   </div>
