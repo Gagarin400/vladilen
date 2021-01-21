@@ -6,6 +6,7 @@
         :key="key"
         :is="`app-${value.type}`"
         v-bind="{ value: value.text }"
+        @delete="$emit('delete', value.id)"
       ></component>
     </template>
     <h3 v-else>Добавьте первый блок, чтобы увидеть результат</h3>
@@ -19,6 +20,7 @@ import AppSubtitle from "./AppSubtitle";
 import AppText from "./AppText";
 
 export default {
+  emit: ['delete'],
   components: { AppTitle, AppAvatar, AppSubtitle, AppText },
   props: {
     empty: Boolean,

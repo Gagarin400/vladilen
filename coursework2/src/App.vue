@@ -10,7 +10,11 @@
         <app-text-area label="Значение" v-model="textAreaValue"></app-text-area>
         <app-button :disabled="disabledBtn">Добавить</app-button>
       </form>
-      <app-resume :content="resume" :loading="load"></app-resume>
+      <app-resume
+        :content="resume"
+        :loading="load"
+        @delete="(id) => deleteResume(id)"
+      ></app-resume>
     </div>
     <app-comments
       textButton="Загрузить комментарии"
@@ -52,20 +56,19 @@ export default {
   methods: {
     async addBlock() {
       try {
-        await fetch(
+        const { data } = await axios.post(
           "https://vue-with-http-d9231-default-rtdb.firebaseio.com/resume.json",
           {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              type: this.selectValue,
-              text: this.textAreaValue,
-            }),
+            type: this.selectValue,
+            text: this.textAreaValue,
           }
         );
-        this.resume.push({ type: this.selectValue, text: this.textAreaValue });
+
+        this.resume.push({
+          id: data.name,
+          type: this.selectValue,
+          text: this.textAreaValue,
+        });
         this.selectValue = "title";
         this.textAreaValue = "";
       } catch (e) {
@@ -83,6 +86,7 @@ export default {
             ...data[key],
           };
         });
+        console.log(this.resume);
       } catch (e) {
         console.log(e.message);
       }
@@ -103,6 +107,16 @@ export default {
       } catch (e) {
         console.log(e.message);
         this.load = false;
+      }
+    },
+    async deleteResume(id) {
+      try {
+        await axios.delete(
+          `https://vue-with-http-d9231-default-rtdb.firebaseio.com/resume/${id}.json`
+        );
+        this.resume = this.resume.filter((i) => i.id !== id);
+      } catch (e) {
+        console.log(e.message);
       }
     },
   },
